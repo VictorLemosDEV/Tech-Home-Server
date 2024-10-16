@@ -5,10 +5,15 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 app.use(express.json());
-app.post('/', (req, res)=>{
-    const {name} = req.body;
+
+app.get('/data', (req, res) => {
+    res.send("Banco de dados")
+})
+
+app.post('/data', (req, res)=>{
+    const {data} = req.body
     
-    res.send(`Welcome ${name}`);
+    res.send(`Publicado no banco de dados:  ${data}`);
 })
 app.listen(PORT, (error) =>{
     if(!error)
