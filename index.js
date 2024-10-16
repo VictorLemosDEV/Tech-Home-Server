@@ -82,15 +82,13 @@ async function connectToCluster(uri) {
 
   
 
-        
+        return mongoClient
     } catch (error) {
         console.error('Connection to MongoDB Atlas failed!', error);
         process.exit();
     }
 
-    console.log(mongoClient)
 
-    return mongoClient
 }
 
 
