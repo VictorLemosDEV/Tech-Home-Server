@@ -72,7 +72,6 @@ async function connectToCluster(uri) {
 
     try {
          mongoClient = await new MongoClient(uri);
-        console.log(mongoClient)
         console.log('Connecting to MongoDB Atlas cluster...');
         let connection = await mongoClient.connect();
         db = connection.db("TechHome")
@@ -84,12 +83,14 @@ async function connectToCluster(uri) {
   
 
         
-
-        return mongoClient;
     } catch (error) {
         console.error('Connection to MongoDB Atlas failed!', error);
         process.exit();
     }
+
+    console.log(mongoClient)
+
+    return mongoClient
 }
 
 
