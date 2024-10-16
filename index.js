@@ -1,56 +1,99 @@
 // app.js
 
 
-const express = require('express');
+import express, { json } from 'express';
 const app = express();
 const PORT = process.env.PORT || 10000;
 
 import { config } from 'dotenv';
 
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 
 config();
 
-
+let db;
 
 app.use(express.json());
 
-app.get('/data', (req, res) => {
+async function GetDataFromMongoDb() {
+
+
+    var collection = db.collection("App Data");
+
+        let data = await collection.findOne({_id: new ObjectId("66e5d2ebe93fee3b400bf619")})
+
+        return data
+    
+}
+
+async function PostDataInMongoDb(Data) {
+
+    var collection = db.collection("App Data");
+
+        let data = await collection.findOneAndReplace({_id: new ObjectId("66e5d2ebe93fee3b400bf619")}, Data)
+
+        return data
+    
+}
+
+app.get('/data', async (req, res) => {
     // Retornar banco de dados
 
+    let data = await GetDataFromMongoDb()
 
-    res.send("Banco de dados")
+
+
+    res.send(data)
 })
 
-app.post('/data', (req, res)=>{
+app.post('/data', async (req, res) => {
     // Publicar a varíavel "data" no banco de dados
 
-    const {data} = req.body
+    const { data } = req.body
+
+    let response = await PostDataInMongoDb(data)
+    response = JSON.stringify(response)
+
+
     
-    res.send(`Publicado no banco de dados:  ${data}`);
+
+    res.send(`Publicado no banco de dados:  ${response}`);
 })
-app.listen(PORT, (error) =>{
-    if(!error)
-        console.log("Server is Successfully Running, and App is listening on port "+ PORT)
-    else 
+app.listen(PORT, (error) => {
+    if (!error)
+        console.log("Server is Successfully Running, and App is listening on port " + PORT)
+    else
         console.log("Error occurred, server can't start", error);
-    }
+}
 );
 
-export async function connectToCluster(uri) {
-    let mongoClient;
- 
+async function connectToCluster(uri) {
+    let mongoClient
+
     try {
         mongoClient = new MongoClient(uri);
         console.log('Connecting to MongoDB Atlas cluster...');
-        await mongoClient.connect();
+        let connection = await mongoClient.connect();
+        db = connection.db("TechHome")
         console.log('Successfully connected to MongoDB Atlas!');
- 
+
+
+        
+
+  
+
+        
+
         return mongoClient;
     } catch (error) {
         console.error('Connection to MongoDB Atlas failed!', error);
         process.exit();
     }
- }
+}
+
+
+
+
+
 
 await connectToCluster(process.env.DB_URI)
