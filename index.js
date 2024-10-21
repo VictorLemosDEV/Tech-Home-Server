@@ -41,6 +41,8 @@ app.get('/data', async (req, res) => {
 
     let data = await GetDataFromMongoDb()
 
+    delete(data["_id"])
+
 
 
     res.send(data)
