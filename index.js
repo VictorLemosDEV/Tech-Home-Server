@@ -1,17 +1,19 @@
 // app.js
 
 
-import express, { json } from 'express';
-const app = express();
-const PORT = process.env.PORT || 10000;
-
+import express from 'express';
+import cors from 'cors';
 import { config } from 'dotenv';
-
 import { MongoClient, ObjectId } from 'mongodb';
 
+const app = express();
+const PORT = process.env.PORT || 10000;
 config();
 
 let db;
+
+// Set up CORS
+app.use(cors({ origin: 'https://whimsical-begonia-a78b46.netlify.app' }));
 
 app.use(express.json());
 
