@@ -15,31 +15,50 @@ let db;
 
 app.use(express.json());
 
-async function GetDataFromMongoDb() {
+async function GetDataFromMongoDb(InitializeData) {
 
 
-    var collection = db.collection("App Data");
+    
+
+
+        if (InitializeData == false) {
+            var collection = db.collection("App Data");
 
         let data = await collection.findOne({_id: new ObjectId("66e5d2ebe93fee3b400bf619")})
 
         return data
+        } else {
+            var collection = db.collection("Arduino Data");
+
+        let data = await collection.findOne({_id: new ObjectId("67227078a64f60cf8cd66109")})
+
+        return data
+        }
     
 }
 
-async function PostDataInMongoDb(Data) {
+async function PostDataInMongoDb(Data, InitializeData) {
 
-    var collection = db.collection("App Data");
+    if (InitializeData == false) {
+        var collection = db.collection("App Data");
 
         let data = await collection.findOneAndReplace({_id: new ObjectId("66e5d2ebe93fee3b400bf619")}, Data)
 
         return data
+    } else {
+        var collection = db.collection("Arduino Data");
+
+        let data = await collection.findOneAndReplace({_id: new ObjectId("67227078a64f60cf8cd66109")}, Data)
+
+        return data
+    }
     
 }
 
 app.get('/data', async (req, res) => {
     // Retornar banco de dados
 
-    let data = await GetDataFromMongoDb()
+    let data = await GetDataFromMongoDb(false)
 
     delete(data["_id"])
 
@@ -53,7 +72,7 @@ app.post('/data', async (req, res) => {
 
     const { data } = req.body
 
-    let response = await PostDataInMongoDb(data)
+    let response = await PostDataInMongoDb(data, false)
     response = JSON.stringify(response)
 
 
@@ -61,6 +80,31 @@ app.post('/data', async (req, res) => {
 
     res.send(`Publicado no banco de dados:  ${response}`);
 })
+
+app.get('/initializedata', async (req, res) => {
+    // Retornar banco de dados
+
+    let data = await GetDataFromMongoDb(true)
+
+    if  (data && data["_id"]) {
+        delete(data["_id"])
+    }
+
+
+
+    res.send(data)
+})
+
+app.post('/initializedata', async (req, res) => {
+    // Publicar a varíavel "data" no banco de dados
+
+    const { data } = req.body
+    let response = await PostDataInMongoDb(data, true)
+    response = JSON.stringify(response)
+
+    res.send(`Chegou as informações: ${JSON.stringify(response)}`)
+})
+
 app.listen(PORT, (error) => {
     if (!error)
         console.log("Server is Successfully Running, and App is listening on port " + PORT)
