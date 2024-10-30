@@ -12,12 +12,13 @@ config();
 
 let db;
 
-// Configura o CORS para permitir solicitações do seu frontend no Netlify
-app.use(cors({
-    origin: 'https://whimsical-begonia-a78b46.netlify.app',
-    methods: ['GET', 'POST'],  // Permite métodos GET e POST
-    allowedHeaders: ['Content-Type']  // Permite o cabeçalho Content-Type
-}));
+// Configuração geral de CORS para todas as rotas
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', 'https://whimsical-begonia-a78b46.netlify.app');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+});
 
 app.use(express.json());
 
