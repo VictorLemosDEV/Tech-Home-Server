@@ -1,6 +1,5 @@
 // app.js
 
-
 import express from 'express';
 import cors from 'cors';
 import { config } from 'dotenv';
@@ -13,146 +12,110 @@ config();
 let db;
 
 // Configuração geral de CORS para todas as rotas
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'https://whimsical-begonia-a78b46.netlify.app');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type');
-    next();
-});
+app.use(cors({
+    origin: 'https://whimsical-begonia-a78b46.netlify.app',
+    methods: 'GET, POST, OPTIONS',
+    allowedHeaders: 'Content-Type',
+}));
 
 app.use(express.json());
 
+// Middleware para tratamento de erros
+const errorHandler = (err, req, res, next) => {
+    console.error(err);
+    res.status(500).send({ error: 'Something went wrong!' });
+};
+
 async function GetDataFromMongoDb(InitializeData) {
-
-
-
-
-
-    if (InitializeData == false) {
-        var collection = db.collection("App Data");
-
-        let data = await collection.findOne({ _id: new ObjectId("66e5d2ebe93fee3b400bf619") })
-
-        return data
-    } else {
-        var collection = db.collection("Arduino Data");
-
-        let data = await collection.findOne({ _id: new ObjectId("67227078a64f60cf8cd66109") })
-
-        return data
+    try {
+        const collection = db.collection(InitializeData ? "Arduino Data" : "App Data");
+        const data = await collection.findOne({ _id: new ObjectId(InitializeData ? "67227078a64f60cf8cd66109" : "66e5d2ebe93fee3b400bf619") });
+        return data;
+    } catch (error) {
+        throw new Error('Failed to fetch data from MongoDB');
     }
-
 }
 
 async function PostDataInMongoDb(Data, InitializeData) {
-
-    if (InitializeData == false) {
-        var collection = db.collection("App Data");
-
-        let data = await collection.findOneAndReplace({ _id: new ObjectId("66e5d2ebe93fee3b400bf619") }, Data)
-
-        return data
-    } else {
-        var collection = db.collection("Arduino Data");
-
-        let data = await collection.findOneAndReplace({ _id: new ObjectId("67227078a64f60cf8cd66109") }, Data)
-
-        return data
+    try {
+        const collection = db.collection(InitializeData ? "Arduino Data" : "App Data");
+        const response = await collection.findOneAndReplace(
+            { _id: new ObjectId(InitializeData ? "67227078a64f60cf8cd66109" : "66e5d2ebe93fee3b400bf619") },
+            Data
+        );
+        return response;
+    } catch (error) {
+        throw new Error('Failed to post data to MongoDB');
     }
-
 }
 
-app.get('/data', async (req, res) => {
-    // Retornar banco de dados
-
-    let data = await GetDataFromMongoDb(false)
-
-    delete (data["_id"])
-
-
-
-    res.send(data)
-})
-
-app.post('/data', async (req, res) => {
-    // Publicar a varíavel "data" no banco de dados
-
-    const { data } = req.body
-
-    let response = await PostDataInMongoDb(data, false)
-    response = JSON.stringify(response)
-
-
-
-
-    res.send(`Publicado no banco de dados:  ${response}`);
-})
-
-app.get('/initializedata', async (req, res) => {
-    // Retornar banco de dados
-
-    let data = await GetDataFromMongoDb(true)
-
-    if (data && data["_id"]) {
-        delete (data["_id"])
+app.get('/data', async (req, res, next) => {
+    try {
+        const data = await GetDataFromMongoDb(false);
+        delete data["_id"];
+        res.send(data);
+    } catch (error) {
+        next(error);
     }
+});
 
-
-
-    res.send(data)
-})
-
-app.post('/initializedata', async (req, res) => {
-    // Publicar a varíavel "data" no banco de dados
-
-    const data = req.body
-    res.send(`O que chegou no servidor: ${data}`)
-
-    if (data) {
-        let response = await PostDataInMongoDb(data, true)
-        response = JSON.stringify(response)
-
-        res.send(`Chegou as informações: ${JSON.stringify(response)}`)
-    } else {
-        res.status(422).send(`Data parameter not found`)
+app.post('/data', async (req, res, next) => {
+    try {
+        const { data } = req.body;
+        const response = await PostDataInMongoDb(data, false);
+        res.send(`Publicado no banco de dados: ${JSON.stringify(response)}`);
+    } catch (error) {
+        next(error);
     }
-})
+});
+
+app.get('/initializedata', async (req, res, next) => {
+    try {
+        const data = await GetDataFromMongoDb(true);
+        if (data && data["_id"]) {
+            delete data["_id"];
+        }
+        res.send(data);
+    } catch (error) {
+        next(error);
+    }
+});
+
+app.post('/initializedata', async (req, res, next) => {
+    try {
+        const data = req.body;
+        if (data) {
+            const response = await PostDataInMongoDb(data, true);
+            res.send(`Chegou as informações: ${JSON.stringify(response)}`);
+        } else {
+            res.status(422).send('Data parameter not found');
+        }
+    } catch (error) {
+        next(error);
+    }
+});
+
+app.use(errorHandler);
 
 app.listen(PORT, (error) => {
     if (!error)
-        console.log("Server is Successfully Running, and App is listening on port " + PORT)
+        console.log(`Server is Successfully Running, and App is listening on port ${PORT}`);
     else
         console.log("Error occurred, server can't start", error);
-}
-);
+});
 
 async function connectToCluster(uri) {
-    let mongoClient
-
+    let mongoClient;
     try {
         mongoClient = await new MongoClient(uri);
         console.log('Connecting to MongoDB Atlas cluster...');
-        let connection = await mongoClient.connect();
-        db = connection.db("TechHome")
+        const connection = await mongoClient.connect();
+        db = connection.db("TechHome");
         console.log('Successfully connected to MongoDB Atlas!');
-
-
-
-
-
-
-        return mongoClient
     } catch (error) {
         console.error('Connection to MongoDB Atlas failed!', error);
         process.exit();
     }
-
-
 }
 
-
-
-
-
-
-await connectToCluster(process.env.DB_URI)
+await connectToCluster(process.env.DB_URI);
