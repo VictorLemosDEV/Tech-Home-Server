@@ -105,7 +105,7 @@ app.get('/initializedata', async (req, res) => {
 app.post('/initializedata', async (req, res) => {
     // Publicar a varíavel "data" no banco de dados
 
-    const { data } = req.body
+    const  data  = req.body
     res.send(`O que chegou no servidor: ${data}`)
     return
     
