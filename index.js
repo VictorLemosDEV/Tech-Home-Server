@@ -106,6 +106,7 @@ app.post('/initializedata', async (req, res) => {
     // Publicar a varíavel "data" no banco de dados
 
     const { data } = req.body
+    console.log(data)
     let response = await PostDataInMongoDb(data, true)
     response = JSON.stringify(response)
 
