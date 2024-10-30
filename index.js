@@ -106,11 +106,15 @@ app.post('/initializedata', async (req, res) => {
     // Publicar a varíavel "data" no banco de dados
 
     const { data } = req.body
-    console.log(data)
-    let response = await PostDataInMongoDb(data, true)
+    
+    if (data) {
+        let response = await PostDataInMongoDb(data, true)
     response = JSON.stringify(response)
 
     res.send(`Chegou as informações: ${JSON.stringify(response)}`)
+    } else {
+        res.status(422).send(`Data parameter not found`)
+    }
 })
 
 app.listen(PORT, (error) => {
