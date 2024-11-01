@@ -85,12 +85,14 @@ app.post('/initializedata', async (req, res, next) => {
     try {
         const data = req.body;
         if (data) {
+            console.log("Someone tried to post this data: ", data)
             const response = await PostDataInMongoDb(data, true);
             res.send(`Chegou as informações: ${JSON.stringify(response)}`);
         } else {
             res.status(422).send('Data parameter not found');
         }
     } catch (error) {
+        console.log(error);
         next(error);
     }
 });
