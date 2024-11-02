@@ -19,6 +19,8 @@ app.use(cors({
 }));
 
 app.use((req, res, next) => {
+    console.log(req.socket.remoteAddress)
+
     let validIps = ['https://whimsical-begonia-a78b46.netlify.app', '127.0.0.1']; // Put your IP whitelist in this array
     
       if(validIps.includes(req.socket.remoteAddress)){
