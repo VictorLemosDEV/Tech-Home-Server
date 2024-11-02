@@ -18,6 +18,22 @@ app.use(cors({
     allowedHeaders: 'Content-Type',
 }));
 
+app.use((req, res, next) => {
+    let validIps = ['https://whimsical-begonia-a78b46.netlify.app', '127.0.0.1']; // Put your IP whitelist in this array
+    
+      if(validIps.includes(req.socket.remoteAddress)){
+          // IP is ok, so go on
+          console.log("IP ok");
+          next();
+      }
+      else{
+          // Invalid ip
+          console.log("Bad IP: " + req.socket.remoteAddress);
+          const err = new Error("Bad IP: " + req.socket.remoteAddress);
+          next(err);
+      }
+    })
+
 app.use(express.json());
 
 // Middleware para tratamento de erros
@@ -69,7 +85,11 @@ app.post('/data', async (req, res, next) => {
     }
 });
 
-app.get('/initializedata', async (req, res, next) => {
+app.get('/initializedata', async (req, res, next) => 
+    {
+
+        console.log(req.socket.remoteAddress)
+
     try {
         const data = await GetDataFromMongoDb(true);
         if (data && data["_id"]) {
@@ -92,7 +112,7 @@ app.post('/initializedata', async (req, res, next) => {
             res.status(422).send('Data parameter not found');
         }
     } catch (error) {
-        console.log(error);
+        console.log(error); 
         next(error);
     }
 });
