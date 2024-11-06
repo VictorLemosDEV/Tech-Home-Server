@@ -79,7 +79,8 @@ async function CheckProductCode(params, InitializeData) {
             for (let index = 0; index < Codes.length; index++) {
                 const element = Codes[index];
 
-                const CodeDecoded = Buffer.from(element,"base64").toString("base64")
+                const CodeDecoded = atob(element)
+                
                 console.log("Code Decoded", CodeDecoded)
                 
 
