@@ -71,6 +71,8 @@ async function CheckProductCode(params, InitializeData) {
         let isValid = false
 
         if (data) {
+
+            delete data["_id"];
             
             const Codes = Object.keys(data)
 
@@ -96,7 +98,7 @@ async function CheckProductCode(params, InitializeData) {
         return isValid
         
     } catch (error) {
-        throw new Error("Failed to verify code")
+        throw new Error("Failed to verify code", error)
         
     }
     
