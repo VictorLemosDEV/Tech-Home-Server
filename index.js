@@ -58,7 +58,7 @@ async function GetDataFromMongoDb(productId,InitializeData,AllData) {
             for (let index = 0; index < Codes.length; index++) {
                 const element = Codes[index];
 
-                const CodeDecoded = Buffer.from(element,"base64").toString("base64")
+                const CodeDecoded = atob(element)
                 
                 
 
