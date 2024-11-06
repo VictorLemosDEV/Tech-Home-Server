@@ -68,12 +68,24 @@ async function CheckProductCode(params, InitializeData) {
     
 }
 
-async function PostDataInMongoDb(Data, InitializeData) {
+async function PostDataInMongoDb(Data,productId, InitializeData) {
     try {
         const collection = db.collection(InitializeData ? "Arduino Data" : "App Data");
+
+        const PreviousData = await GetDataFromMongoDb(true)
+
+        let newData = Data
+
+        if (PreviousData[Buffer.from(productId,"base64")]) {
+
+            newData = PreviousData
+            newData[btoa(productId)] = Data
+
+        }
+
         const response = await collection.findOneAndReplace(
             { _id: new ObjectId(InitializeData ? "67227078a64f60cf8cd66109" : "66e5d2ebe93fee3b400bf619") },
-            Data
+            newData
         );
 
         return response;
@@ -129,7 +141,7 @@ app.post('/initializedata/:productid', async (req, res, next) => {
         
         if (data && IsCodeValid) {
             console.log("Someone tried to post this data: ", data)
-            const response = await PostDataInMongoDb(data, true);
+            const response = await PostDataInMongoDb(data,productId, true);
             res.send(`Chegou as informações: ${JSON.stringify(response)}`);
         } else {
             res.status(422).send('Data parameter not found or code invalid');
