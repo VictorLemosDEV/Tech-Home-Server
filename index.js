@@ -77,7 +77,7 @@ async function GetDataFromMongoDb(productId,InitializeData,AllData) {
        
     } catch (error) {
        
-
+        console.log(error)
         
     }
 }
@@ -175,12 +175,10 @@ app.post('/data', async (req, res, next) => {
 app.get('/initializedata/:productid', async (req, res, next) => 
     {
 
-        console.log(req.socket.remoteAddress)
 
 
     try {
         const data = await GetDataFromMongoDb(req.params.productid,true,false);
-        console.log(data)
         if (data && data["_id"]) {
             delete data["_id"];
         }
