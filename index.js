@@ -39,10 +39,11 @@ async function GetDataFromMongoDb(productId,InitializeData,AllData) {
                 const element = Codes[index];
 
                 const CodeDecoded = Buffer.from(element,"base64").toString("base64")
-                console.log("Code Decoded", CodeDecoded)
+                
                 
 
                 isValid = ValidProductCodes.includes(CodeDecoded)
+                console.log("Is my soul valid?", isValid)
                 if (!isValid) return false
 
                 
