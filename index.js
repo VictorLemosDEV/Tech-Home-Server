@@ -31,7 +31,41 @@ async function GetDataFromMongoDb(InitializeData) {
         return data;
     } catch (error) {
         throw new Error('Failed to fetch data from MongoDB');
+
+        
     }
+}
+
+async function CheckProductCode(params, InitializeData) {
+
+    try {
+
+        const collection = db.collection(InitializeData ? "Arduino Data" : "App Data");
+        const data = await collection.findOne({ _id: new ObjectId(InitializeData ? "67227078a64f60cf8cd66109" : "66e5d2ebe93fee3b400bf619") });
+
+        if (data) {
+            
+            const Codes = Object.keys(data)
+
+            for (let index = 0; index < Codes.length; index++) {
+                const element = Codes[index];
+
+                const CodeDecoded = Buffer.from(element,"base64")
+
+                console.log(CodeDecoded)
+                
+            }
+
+
+            
+            return true
+        }
+        
+    } catch (error) {
+        throw new Error("Failed to verify code")
+        
+    }
+    
 }
 
 async function PostDataInMongoDb(Data, InitializeData) {
@@ -41,6 +75,7 @@ async function PostDataInMongoDb(Data, InitializeData) {
             { _id: new ObjectId(InitializeData ? "67227078a64f60cf8cd66109" : "66e5d2ebe93fee3b400bf619") },
             Data
         );
+
         return response;
     } catch (error) {
         throw new Error('Failed to post data to MongoDB');
@@ -67,10 +102,11 @@ app.post('/data', async (req, res, next) => {
     }
 });
 
-app.get('/initializedata', async (req, res, next) => 
+app.get('/initializedata/:productid', async (req, res, next) => 
     {
 
         console.log(req.socket.remoteAddress)
+        console.log(req.params.productid)
 
     try {
         const data = await GetDataFromMongoDb(true);
@@ -83,15 +119,20 @@ app.get('/initializedata', async (req, res, next) =>
     }
 });
 
-app.post('/initializedata', async (req, res, next) => {
+app.post('/initializedata/:productid', async (req, res, next) => {
     try {
         const data = req.body;
-        if (data) {
+        const productId = req.params.productid
+
+        const IsCodeValid = await CheckProductCode(productId,true)
+
+        
+        if (data && IsCodeValid) {
             console.log("Someone tried to post this data: ", data)
             const response = await PostDataInMongoDb(data, true);
             res.send(`Chegou as informações: ${JSON.stringify(response)}`);
         } else {
-            res.status(422).send('Data parameter not found');
+            res.status(422).send('Data parameter not found or code invalid');
         }
     } catch (error) {
         console.log(error); 
