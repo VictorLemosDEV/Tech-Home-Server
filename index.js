@@ -53,18 +53,22 @@ async function GetDataFromMongoDb(productId,InitializeData,AllData) {
             
 
         } else {
-            const Codes = Object.keys(data)
+            let Codes = Object.keys(data)
+
+            delete Codes["_id"]
 
             console.log("List of Codes",Codes)
 
             for (let index = 0; index < Codes.length; index++) {
                 const element = Codes[index];
 
+                console.log("Trying to decode", element)
+
                 const CodeDecoded = atob(element)
                 
                 
 
-                isValid = ValidProductCodes.includes(CodeDecoded)
+                isValid = (ValidProductCodes.includes(CodeDecoded) && productId == CodeDecoded)
                 console.log("Is my soul valid? All Data", isValid)
                 if (!isValid) return false
 
