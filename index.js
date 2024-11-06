@@ -29,6 +29,8 @@ async function GetDataFromMongoDb(productId,InitializeData,AllData) {
         const collection = db.collection(InitializeData ? "Arduino Data" : "App Data");
         const data = await collection.findOne({ _id: new ObjectId(InitializeData ? "67227078a64f60cf8cd66109" : "66e5d2ebe93fee3b400bf619") });
 
+        console.log(productId)
+
         if (AllData) {
 
             const Codes = Object.keys(data)
