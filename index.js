@@ -38,9 +38,10 @@ async function GetDataFromMongoDb(productId,InitializeData,AllData) {
             console.log("List of Codes",Codes)
 
             for (let index = 0; index < Codes.length; index++) {
+                if (Codes[index] == "_id") continue;
                 const element = Codes[index];
 
-                const CodeDecoded = Buffer.from(element,"base64").toString("base64")
+                const CodeDecoded = atob(element)
                 
                 
 
@@ -57,6 +58,8 @@ async function GetDataFromMongoDb(productId,InitializeData,AllData) {
 
 
             console.log("List of Codes",Codes)
+
+            let isValid = false
 
             for (let index = 0; index < Codes.length; index++) {
                 if (Codes[index] == "_id") continue
