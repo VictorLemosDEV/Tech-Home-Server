@@ -73,14 +73,15 @@ async function GetDataFromMongoDb(productId,InitializeData,AllData) {
 
                 isValid = (ValidProductCodes.includes(CodeDecoded) && productId == CodeDecoded)
                 console.log("Is my soul valid? All Data", isValid)
-                if (!isValid) return false
-
+                
+                if (!isValid) continue
 
                 return data[element]
 
                 
                 
             }
+            return false
         }
 
        
