@@ -53,7 +53,7 @@ async function GetDataFromMongoDb(productId,InitializeData,AllData) {
 
        
     } catch (error) {
-        throw new Error('Failed to fetch data from MongoDB');
+        throw new Error('Failed to fetch data from MongoDB', error);
 
         
     }
