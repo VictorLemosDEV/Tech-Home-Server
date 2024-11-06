@@ -24,10 +24,29 @@ const errorHandler = (err, req, res, next) => {
     res.status(500).send({ error: 'Something went wrong!' });
 };
 
-async function GetDataFromMongoDb(InitializeData) {
+async function GetDataFromMongoDb(productId,InitializeData) {
     try {
         const collection = db.collection(InitializeData ? "Arduino Data" : "App Data");
         const data = await collection.findOne({ _id: new ObjectId(InitializeData ? "67227078a64f60cf8cd66109" : "66e5d2ebe93fee3b400bf619") });
+
+        const Codes = Object.keys(data)
+
+            console.log("List of Codes",Codes)
+
+            for (let index = 0; index < Codes.length; index++) {
+                const element = Codes[index];
+
+                const CodeDecoded = Buffer.from(element,"base64").toString("base64")
+                console.log("Code Decoded", CodeDecoded)
+                
+
+                isValid = ValidProductCodes.includes(CodeDecoded)
+                if (isValid) {
+                    return data[element]
+                }
+                
+            }
+
         return data;
     } catch (error) {
         throw new Error('Failed to fetch data from MongoDB');
@@ -80,7 +99,7 @@ async function PostDataInMongoDb(Data,productId, InitializeData) {
     try {
         const collection = db.collection(InitializeData ? "Arduino Data" : "App Data");
 
-        const PreviousData = await GetDataFromMongoDb(true)
+        const PreviousData = await GetDataFromMongoDb(productId,true)
 
         let newData = Data
 
@@ -128,8 +147,10 @@ app.get('/initializedata/:productid', async (req, res, next) =>
 
         console.log(req.socket.remoteAddress)
 
+
     try {
-        const data = await GetDataFromMongoDb(true);
+        const data = await GetDataFromMongoDb(req.params.productid,true);
+        console.log(data)
         if (data && data["_id"]) {
             delete data["_id"];
         }
