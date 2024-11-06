@@ -14,7 +14,7 @@ let db;
 // Configuração geral de CORS para todas as rotas
 app.use(cors())
 
-
+const ValidProductCodes = ["123456", "654321", "314159"]
 
 app.use(express.json());
 
@@ -43,6 +43,8 @@ async function CheckProductCode(params, InitializeData) {
         const collection = db.collection(InitializeData ? "Arduino Data" : "App Data");
         const data = await collection.findOne({ _id: new ObjectId(InitializeData ? "67227078a64f60cf8cd66109" : "66e5d2ebe93fee3b400bf619") });
 
+        let isValid = false
+
         if (data) {
             
             const Codes = Object.keys(data)
@@ -52,14 +54,16 @@ async function CheckProductCode(params, InitializeData) {
 
                 const CodeDecoded = Buffer.from(element,"base64")
 
-                console.log(CodeDecoded)
+                isValid = ValidProductCodes.includes(CodeDecoded)
                 
             }
 
 
             
-            return true
+            return isValid
         }
+
+        return isValid
         
     } catch (error) {
         throw new Error("Failed to verify code")
@@ -76,12 +80,13 @@ async function PostDataInMongoDb(Data,productId, InitializeData) {
 
         let newData = Data
 
-        if (PreviousData[Buffer.from(productId,"base64")]) {
 
             newData = PreviousData
             newData[btoa(productId)] = Data
 
-        }
+            console.log(newData)
+
+       
 
         const response = await collection.findOneAndReplace(
             { _id: new ObjectId(InitializeData ? "67227078a64f60cf8cd66109" : "66e5d2ebe93fee3b400bf619") },
@@ -118,7 +123,6 @@ app.get('/initializedata/:productid', async (req, res, next) =>
     {
 
         console.log(req.socket.remoteAddress)
-        console.log(req.params.productid)
 
     try {
         const data = await GetDataFromMongoDb(true);
@@ -145,6 +149,7 @@ app.post('/initializedata/:productid', async (req, res, next) => {
             res.send(`Chegou as informações: ${JSON.stringify(response)}`);
         } else {
             res.status(422).send('Data parameter not found or code invalid');
+            console.log(productId)
         }
     } catch (error) {
         console.log(error); 
