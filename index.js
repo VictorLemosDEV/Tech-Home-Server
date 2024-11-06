@@ -135,6 +135,8 @@ async function CheckProductCode(params, InitializeData) {
 }
 
 async function PostDataInMongoDb(Data,productId, InitializeData) {
+    console.log(Data, productId)
+
     try {
         const collection = db.collection(InitializeData ? "Arduino Data" : "App Data");
 
