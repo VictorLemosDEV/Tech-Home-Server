@@ -30,6 +30,7 @@ async function GetDataFromMongoDb(productId,InitializeData,AllData) {
         const data = await collection.findOne({ _id: new ObjectId(InitializeData ? "67227078a64f60cf8cd66109" : "66e5d2ebe93fee3b400bf619") });
 
         console.log(productId)
+        let isValid = false
 
         if (AllData) {
 
@@ -59,7 +60,6 @@ async function GetDataFromMongoDb(productId,InitializeData,AllData) {
 
             console.log("List of Codes",Codes)
 
-            let isValid = false
 
             for (let index = 0; index < Codes.length; index++) {
                 if (Codes[index] == "_id") continue
