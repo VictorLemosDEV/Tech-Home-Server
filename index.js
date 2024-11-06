@@ -29,7 +29,9 @@ async function GetDataFromMongoDb(productId,InitializeData,AllData) {
         const collection = db.collection(InitializeData ? "Arduino Data" : "App Data");
         const data = await collection.findOne({ _id: new ObjectId(InitializeData ? "67227078a64f60cf8cd66109" : "66e5d2ebe93fee3b400bf619") });
 
-        const Codes = Object.keys(data)
+        if (AllData) {
+
+            const Codes = Object.keys(data)
 
             console.log("List of Codes",Codes)
 
@@ -43,13 +45,13 @@ async function GetDataFromMongoDb(productId,InitializeData,AllData) {
                 isValid = ValidProductCodes.includes(CodeDecoded)
                 if (!isValid) return false
 
-                if (AllData) {
-                    return data
-                } else {
-                    return data[element]
-                }
+                
                 
             }
+
+        } else {
+            return data
+        }
 
        
     } catch (error) {
