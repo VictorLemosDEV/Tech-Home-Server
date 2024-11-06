@@ -49,19 +49,22 @@ async function CheckProductCode(params, InitializeData) {
             
             const Codes = Object.keys(data)
 
+            console.log("List of Codes",Codes)
+
             for (let index = 0; index < Codes.length; index++) {
                 const element = Codes[index];
 
                 const CodeDecoded = Buffer.from(element,"base64").toString("base64")
-                console.log(CodeDecoded)
+                console.log("Code Decoded", CodeDecoded)
+                
 
                 isValid = ValidProductCodes.includes(CodeDecoded)
+                if (isValid) return isValid
                 
             }
 
 
             
-            return isValid
         }
 
         return isValid
@@ -150,7 +153,7 @@ app.post('/initializedata/:productid', async (req, res, next) => {
             res.send(`Chegou as informações: ${JSON.stringify(response)}`);
         } else {
             res.status(422).send('Data parameter not found or code invalid');
-            console.log(productId, IsCodeValid)
+            console.log("Product ID",productId, "Is Code Valid",IsCodeValid)
         }
     } catch (error) {
         console.log(error); 
