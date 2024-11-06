@@ -55,11 +55,11 @@ async function GetDataFromMongoDb(productId,InitializeData,AllData) {
         } else {
             let Codes = Object.keys(data)
 
-            delete Codes["_id"]
 
             console.log("List of Codes",Codes)
 
             for (let index = 0; index < Codes.length; index++) {
+                if (Codes[index] == "_id") continue
                 const element = Codes[index];
 
                 console.log("Trying to decode", element)
