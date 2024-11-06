@@ -116,7 +116,7 @@ async function PostDataInMongoDb(Data,productId, InitializeData) {
             newData = PreviousData
             newData[btoa(productId)] = Data
 
-            console.log(newData)
+            console.log("Data to be posted", newData)
 
        
 
