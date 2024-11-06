@@ -48,12 +48,11 @@ async function CheckProductCode(params, InitializeData) {
         if (data) {
             
             const Codes = Object.keys(data)
-            console.log(Codes)
 
             for (let index = 0; index < Codes.length; index++) {
                 const element = Codes[index];
 
-                const CodeDecoded = Buffer.from(element,"base64")
+                const CodeDecoded = Buffer.from(element,"base64").toString("base64")
                 console.log(CodeDecoded)
 
                 isValid = ValidProductCodes.includes(CodeDecoded)
