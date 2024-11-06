@@ -44,14 +44,34 @@ async function GetDataFromMongoDb(productId,InitializeData,AllData) {
 
                 isValid = ValidProductCodes.includes(CodeDecoded)
                 console.log("Is my soul valid?", isValid)
+                if (isValid) return data
+
+            }
+
+            
+
+        } else {
+            const Codes = Object.keys(data)
+
+            console.log("List of Codes",Codes)
+
+            for (let index = 0; index < Codes.length; index++) {
+                const element = Codes[index];
+
+                const CodeDecoded = Buffer.from(element,"base64").toString("base64")
+                
+                
+
+                isValid = ValidProductCodes.includes(CodeDecoded)
+                console.log("Is my soul valid? All Data", isValid)
                 if (!isValid) return false
+
+
+                return data[element]
 
                 
                 
             }
-
-        } else {
-            return data
         }
 
        
@@ -128,7 +148,7 @@ async function PostDataInMongoDb(Data,productId, InitializeData) {
 
         return response;
     } catch (error) {
-        throw new Error('Failed to post data to MongoDB');
+        throw new Error('Failed to post data to MongoDB', error);
     }
 }
 
